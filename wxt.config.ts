@@ -11,6 +11,16 @@ export default defineConfig({
     name: 'ImageGrab',
     description: 'Quickly save images from any webpage',
     permissions: ['downloads', 'contextMenus', 'activeTab', 'scripting', 'storage'],
+    host_permissions: ['<all_urls>'],
+    commands: {
+      'open-batch-modal': {
+        suggested_key: {
+          default: 'Alt+Shift+I',
+          mac: 'Alt+Shift+I',
+        },
+        description: 'Open ImageGrab Batch Downloader',
+      },
+    },
     browser_specific_settings: {
       gecko: {
         id: '{30f41d2a-7d16-40be-8400-1329a834e65a}',

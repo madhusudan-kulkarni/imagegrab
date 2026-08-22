@@ -1,9 +1,28 @@
 {
   "name": "imagegrab",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "type": "module",
-  "description": "Quickly save images from any webpage",
-  "main": "index.js",
+  "description": "Quickly save images from any webpage in single click or ZIP batch",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/madhusudan-kulkarni/imagegrab.git"
+  },
+  "homepage": "https://github.com/madhusudan-kulkarni/imagegrab#readme",
+  "bugs": {
+    "url": "https://github.com/madhusudan-kulkarni/imagegrab/issues"
+  },
+  "keywords": [
+    "browser-extension",
+    "image-downloader",
+    "image-grabber",
+    "batch-downloader",
+    "wxt",
+    "chrome-extension",
+    "firefox-addon"
+  ],
+  "author": "Madhusudan Kulkarni",
+  "license": "ISC",
+  "packageManager": "pnpm@10.20.0",
   "scripts": {
     "dev": "wxt",
     "dev:firefox": "wxt -b firefox",
@@ -13,16 +32,16 @@
     "zip:firefox": "wxt zip -b firefox",
     "postinstall": "wxt prepare"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "packageManager": "pnpm@10.20.0",
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.18",
+    "@types/jszip": "^3.4.1",
     "autoprefixer": "^10.4.24",
     "postcss": "^8.5.6",
     "tailwindcss": "^4.1.18",
     "typescript": "^5.9.3",
     "wxt": "^0.20.17"
+  },
+  "dependencies": {
+    "jszip": "^3.10.1"
   }
 }
