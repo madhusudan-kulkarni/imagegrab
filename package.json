@@ -30,6 +30,7 @@
     "build:firefox": "wxt build -b firefox",
     "zip": "wxt zip",
     "zip:firefox": "wxt zip -b firefox",
+    "submit:firefox": "wxt submit --firefox-zip .output/imagegrab-firefox.zip --firefox-sources-zip .output/imagegrab-1.1.0-sources.zip --firefox-extension-id image-grab --firefox-channel listed",
     "icons": "node scripts/generate-icons.js",
     "postinstall": "wxt prepare"
   },
