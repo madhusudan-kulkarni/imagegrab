@@ -40,4 +40,20 @@ jobs:
           files: |
             .output/*-chrome.zip
             .output/*-firefox.zip
+            .output/*-sources.zip
           generate_release_notes: true
+
+      - name: Submit to Mozilla Add-ons (AMO)
+        if: env.FIREFOX_JWT_ISSUER != '' && env.FIREFOX_JWT_SECRET != ''
+        env:
+          FIREFOX_JWT_ISSUER: ${{ secrets.FIREFOX_JWT_ISSUER }}
+          FIREFOX_JWT_SECRET: ${{ secrets.FIREFOX_JWT_SECRET }}
+        run: |
+          pnpm wxt submit \
+            --firefox-zip .output/imagegrab-firefox.zip \
+            --firefox-sources-zip $(ls .output/*-sources.zip | head -n 1) \
+            --firefox-extension-id 'image-grab' \
+            --firefox-jwt-issuer "$FIREFOX_JWT_ISSUER" \
+            --firefox-jwt-secret "$FIREFOX_JWT_SECRET" \
+            --firefox-channel listed
+
