@@ -5,11 +5,11 @@
   "description": "Quickly save images from any webpage in single click or ZIP batch",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/madhusudan-kulkarni/imagegrab.git"
+    "url": "git+https://github.com/madhusudan-kulkarni/image-grab.git"
   },
-  "homepage": "https://github.com/madhusudan-kulkarni/imagegrab#readme",
+  "homepage": "https://github.com/madhusudan-kulkarni/image-grab#readme",
   "bugs": {
-    "url": "https://github.com/madhusudan-kulkarni/imagegrab/issues"
+    "url": "https://github.com/madhusudan-kulkarni/image-grab/issues"
   },
   "keywords": [
     "browser-extension",
