@@ -1,4 +1,4 @@
-import { settings, BatchDownloadMode, HoverKeyModifier } from '~/utils/storage';
+import { settings, HoverKeyModifier } from '~/utils/storage';
 import { formatFilename, getTimestamp } from '~/utils/filename';
 
 const root = document.getElementById('root');
@@ -13,9 +13,7 @@ async function mountPopup(container: HTMLElement) {
     hoverOverlayEnabled: await settings.hoverOverlayEnabled.getValue(),
     batchSubfolder: await settings.batchSubfolder.getValue(),
     minHoverSize: await settings.minHoverSize.getValue(),
-    batchDownloadMode: await settings.batchDownloadMode.getValue(),
     hoverKeyModifier: await settings.hoverKeyModifier.getValue(),
-    saved: false,
   };
 
   container.innerHTML = '';
@@ -26,152 +24,136 @@ async function mountPopup(container: HTMLElement) {
     body {
       margin: 0;
       padding: 0;
-      width: 360px;
+      width: 350px;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       background: #f8fafc;
       color: #0f172a;
+      -webkit-font-smoothing: antialiased;
     }
     .popup-card {
-      padding: 16px;
+      padding: 14px 16px 16px;
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 12px;
     }
     .header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      border-bottom: 1px solid #e2e8f0;
-      padding-bottom: 12px;
+      padding-bottom: 2px;
     }
     .logo-wrap {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
     }
     .logo-icon {
-      width: 32px;
-      height: 32px;
+      width: 28px;
+      height: 28px;
       background: #eff6ff;
-      border-radius: 8px;
+      border: 1px solid #dbeafe;
+      border-radius: 7px;
       display: flex;
       align-items: center;
       justify-content: center;
     }
     .title {
       margin: 0;
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 700;
       color: #0f172a;
+      letter-spacing: -0.2px;
     }
-    .version-pill {
-      font-size: 11px;
-      font-weight: 600;
-      color: #64748b;
-      background: #e2e8f0;
-      padding: 2px 6px;
-      border-radius: 12px;
-    }
-    .shortcut-tip {
-      background: #eff6ff;
-      border: 1px solid #dbeafe;
-      border-radius: 8px;
-      padding: 8px 10px;
-      font-size: 11.5px;
-      color: #1e40af;
+    .header-right {
       display: flex;
       align-items: center;
       gap: 6px;
     }
-    .shortcut-kbd {
-      background: #ffffff;
-      border: 1px solid #bfdbfe;
-      border-radius: 4px;
-      padding: 1px 5px;
-      font-family: monospace;
+    .save-indicator {
       font-size: 11px;
       font-weight: 600;
-      color: #1d4ed8;
-    }
-    .section-label {
-      font-size: 13px;
-      font-weight: 600;
-      color: #334155;
-      margin-bottom: 4px;
-      display: block;
-    }
-    .input-wrap {
+      color: #10b981;
+      opacity: 0;
+      transform: translateY(-2px);
+      transition: opacity 0.2s ease, transform 0.2s ease;
       display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-    .text-input {
-      width: 100%;
-      padding: 8px 12px;
-      border: 1px solid #cbd5e1;
-      border-radius: 8px;
-      font-size: 12px;
-      color: #0f172a;
-      outline: none;
-      background: #ffffff;
-      font-family: monospace;
-      transition: border-color 0.15s ease, box-shadow 0.15s ease;
-    }
-    .text-input:focus {
-      border-color: #2563eb;
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
-    }
-    .tokens-bar {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 4px;
-    }
-    .token-chip {
-      background: #ffffff;
-      border: 1px solid #e2e8f0;
-      padding: 3px 7px;
-      border-radius: 6px;
-      font-size: 11px;
-      font-family: monospace;
-      color: #2563eb;
-      cursor: pointer;
-      user-select: none;
-      transition: all 0.15s ease;
-    }
-    .token-chip:hover {
-      background: #eff6ff;
-      border-color: #93c5fd;
-    }
-    .preview-box {
-      background: #0f172a;
-      border-radius: 8px;
-      padding: 8px 12px;
-      display: flex;
-      flex-direction: column;
+      align-items: center;
       gap: 3px;
     }
-    .preview-label {
-      font-size: 10px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      font-weight: 700;
-      color: #94a3b8;
+    .save-indicator.visible {
+      opacity: 1;
+      transform: translateY(0);
     }
-    .preview-value {
-      font-size: 11px;
-      font-family: monospace;
-      color: #38bdf8;
-      word-break: break-all;
+    .version-pill {
+      font-size: 10.5px;
+      font-weight: 600;
+      color: #64748b;
+      background: #e2e8f0;
+      padding: 2px 6px;
+      border-radius: 10px;
     }
-    .toggles-wrap {
+
+    /* Primary Action Card */
+    .hero-btn {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 10px 14px;
+      background: #0f172a;
+      color: #ffffff;
+      border: 1px solid #1e293b;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(15, 23, 42, 0.08);
+      transition: all 0.15s ease;
+      outline: none;
+    }
+    .hero-btn:hover {
+      background: #1e293b;
+      box-shadow: 0 4px 10px rgba(15, 23, 42, 0.18);
+      transform: translateY(-1px);
+    }
+    .hero-btn:active {
+      transform: translateY(0);
+    }
+    .hero-btn-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .kbd-shortcut {
+      background: #334155;
+      color: #cbd5e1;
+      border: 1px solid #475569;
+      border-radius: 4px;
+      padding: 2px 6px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 10.5px;
+      font-weight: 500;
+    }
+
+    /* Section Card */
+    .section-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 12px;
       display: flex;
       flex-direction: column;
       gap: 10px;
-      background: #ffffff;
-      padding: 12px;
-      border-radius: 10px;
-      border: 1px solid #e2e8f0;
     }
+    .card-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #64748b;
+    }
+
+    /* Toggle Rows */
     .toggle-row {
       display: flex;
       align-items: center;
@@ -185,13 +167,14 @@ async function mountPopup(container: HTMLElement) {
     }
     .toggle-switch {
       position: relative;
-      width: 40px;
+      width: 38px;
       height: 22px;
       background: #cbd5e1;
       border-radius: 999px;
       border: none;
       cursor: pointer;
       padding: 0;
+      flex-shrink: 0;
       transition: background-color 0.15s ease;
     }
     .toggle-switch.active {
@@ -209,70 +192,125 @@ async function mountPopup(container: HTMLElement) {
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
     }
     .toggle-switch.active .toggle-knob {
-      transform: translateX(18px);
+      transform: translateX(16px);
+    }
+
+    /* Conditional Nested Options */
+    .nested-options {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-left: 10px;
+      border-left: 2px solid #e2e8f0;
+      margin-left: 2px;
+      transition: all 0.2s ease;
+    }
+    .nested-options.hidden {
+      display: none;
     }
     .select-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding-top: 4px;
-      border-top: 1px solid #f1f5f9;
+      gap: 8px;
+    }
+    .select-label {
+      font-size: 11.5px;
+      color: #64748b;
+      font-weight: 500;
     }
     .select-input {
       background: #f8fafc;
       border: 1px solid #cbd5e1;
       border-radius: 6px;
       padding: 4px 8px;
-      font-size: 12px;
+      font-size: 11.5px;
       color: #334155;
       outline: none;
+      cursor: pointer;
     }
-    .actions-wrap {
+    .select-input:focus {
+      border-color: #2563eb;
+    }
+
+    /* Filename Template */
+    .template-input-wrap {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 6px;
     }
-    .btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
+    .text-input {
       width: 100%;
-      padding: 9px 14px;
-      border-radius: 8px;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.15s ease;
-      border: 1px solid transparent;
+      padding: 7px 10px;
+      border: 1px solid #cbd5e1;
+      border-radius: 7px;
+      font-size: 11.5px;
+      color: #0f172a;
       outline: none;
+      background: #f8fafc;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      transition: all 0.15s ease;
     }
-    .btn-primary {
-      background: #0f172a;
-      color: #ffffff;
+    .text-input:focus {
+      background: #ffffff;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
     }
-    .btn-primary:hover {
-      background: #1e293b;
-      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.2);
+    .tokens-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
     }
-    .btn-secondary {
-      background: #2563eb;
-      color: #ffffff;
+    .token-chip {
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 10.5px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      color: #2563eb;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.15s ease;
     }
-    .btn-secondary:hover {
-      background: #1d4ed8;
-      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+    .token-chip:hover {
+      background: #eff6ff;
+      border-color: #93c5fd;
     }
-    .btn-success {
-      background: #10b981 !important;
-      color: #ffffff !important;
+    .preview-line {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+      font-size: 11px;
+      color: #64748b;
+      margin-top: 2px;
+      overflow: hidden;
     }
-    .status-msg {
-      font-size: 12px;
+    .preview-tag {
+      font-size: 9.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      color: #475569;
+      background: #f1f5f9;
+      padding: 1px 4px;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+    .preview-val {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      color: #0284c7;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .status-error {
+      font-size: 11.5px;
       color: #dc2626;
       text-align: center;
       margin: 0;
-      min-height: 16px;
+      min-height: 0;
     }
   `;
   container.appendChild(style);
@@ -280,133 +318,119 @@ async function mountPopup(container: HTMLElement) {
   const app = document.createElement('div');
   app.className = 'popup-card';
 
+  // Save Indicator Helper
+  let saveTimer: any = null;
+  const triggerSavedFeedback = () => {
+    saveIndicator.classList.add('visible');
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(() => {
+      saveIndicator.classList.remove('visible');
+    }, 1200);
+  };
+
   // Header
   const header = document.createElement('div');
   header.className = 'header';
-  header.innerHTML = `
-    <div class="logo-wrap">
-      <div class="logo-icon">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="#2563eb">
-          <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
-        </svg>
-      </div>
-      <h1 class="title">ImageGrab</h1>
+
+  const logoWrap = document.createElement('div');
+  logoWrap.className = 'logo-wrap';
+  logoWrap.innerHTML = `
+    <div class="logo-icon">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="#2563eb">
+        <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
+      </svg>
     </div>
-    <span class="version-pill">v1.1.0</span>
+    <h1 class="title">ImageGrab</h1>
   `;
 
-  // Shortcut Tip
-  const shortcutTip = document.createElement('div');
-  shortcutTip.className = 'shortcut-tip';
-  shortcutTip.innerHTML = `
-    <span>Shortcut: Press</span>
-    <span class="shortcut-kbd">Alt + Shift + I</span>
-    <span>to open batch grabber.</span>
+  const headerRight = document.createElement('div');
+  headerRight.className = 'header-right';
+
+  const saveIndicator = document.createElement('span');
+  saveIndicator.className = 'save-indicator';
+  saveIndicator.innerHTML = `
+    <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor">
+      <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+    </svg>
+    <span>Saved</span>
   `;
 
-  // Template section
-  const templateSection = document.createElement('div');
-  templateSection.className = 'input-wrap';
+  const versionPill = document.createElement('span');
+  versionPill.className = 'version-pill';
+  versionPill.textContent = 'v1.1.0';
 
-  const templateLabel = document.createElement('label');
-  templateLabel.className = 'section-label';
-  templateLabel.textContent = 'Filename Template';
+  headerRight.append(saveIndicator, versionPill);
+  header.append(logoWrap, headerRight);
 
-  const templateInput = document.createElement('input');
-  templateInput.type = 'text';
-  templateInput.className = 'text-input';
-  templateInput.value = state.filenameTemplate;
-
-  const tokensBar = document.createElement('div');
-  tokensBar.className = 'tokens-bar';
-
-  const availableTokens = [
-    '${domain}',
-    '${timestamp}',
-    '${original_name}',
-    '${index}',
-    '${index_00}',
-    '${ext}',
-    '${page_title}',
-  ];
-
-  availableTokens.forEach((token) => {
-    const chip = document.createElement('span');
-    chip.className = 'token-chip';
-    chip.textContent = token;
-    chip.title = `Insert ${token}`;
-    chip.addEventListener('click', () => {
-      const start = templateInput.selectionStart || templateInput.value.length;
-      const end = templateInput.selectionEnd || templateInput.value.length;
-      const current = templateInput.value;
-      templateInput.value = current.slice(0, start) + token + current.slice(end);
-      templateInput.focus();
-      templateInput.setSelectionRange(start + token.length, start + token.length);
-      state.filenameTemplate = templateInput.value;
-      updatePreview();
-    });
-    tokensBar.appendChild(chip);
-  });
-
-  // Preview Box
-  const previewBox = document.createElement('div');
-  previewBox.className = 'preview-box';
-  previewBox.innerHTML = `
-    <span class="preview-label">Live Preview</span>
-    <span class="preview-value" id="ig-preview-text"></span>
+  // Hero Action Button
+  const heroBtn = document.createElement('button');
+  heroBtn.className = 'hero-btn';
+  heroBtn.innerHTML = `
+    <div class="hero-btn-left">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+        <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
+      </svg>
+      <span>Open Batch Downloader</span>
+    </div>
+    <span class="kbd-shortcut">Alt+Shift+I</span>
   `;
-  const previewText = previewBox.querySelector('#ig-preview-text') as HTMLElement;
 
-  const updatePreview = () => {
-    const sampleOptions = {
-      originalName: 'photo-sunset',
-      ext: 'jpg',
-      domain: 'unsplash.com',
-      timestamp: getTimestamp(),
-      index: 1,
-      pageTitle: 'Nature Wallpapers',
-      width: 1920,
-      height: 1080,
-    };
-    try {
-      previewText.textContent = formatFilename(state.filenameTemplate || '${domain}_${timestamp}_${index}.${ext}', sampleOptions);
-    } catch {
-      previewText.textContent = 'Invalid template';
+  const statusError = document.createElement('p');
+  statusError.className = 'status-error';
+
+  heroBtn.addEventListener('click', async () => {
+    statusError.textContent = '';
+    const [tab] = await browser.tabs.query({ active: true, currentWindow: true });
+    if (!tab?.id) {
+      statusError.textContent = 'No active webpage tab found.';
+      return;
     }
-  };
-
-  templateInput.addEventListener('input', () => {
-    state.filenameTemplate = templateInput.value;
-    updatePreview();
+    try {
+      const res = await browser.runtime.sendMessage({ type: 'open-batch-modal', tabId: tab.id });
+      if (res?.ok === false) {
+        statusError.textContent = 'Batch grabber is unavailable on this page.';
+        return;
+      }
+      window.close();
+    } catch {
+      statusError.textContent = 'Cannot inject into this page (e.g. browser system page).';
+    }
   });
 
-  updatePreview();
-
-  templateSection.append(templateLabel, templateInput, tokensBar, previewBox);
-
-  // Toggles section
-  const togglesWrap = document.createElement('div');
-  togglesWrap.className = 'toggles-wrap';
+  // Settings Card
+  const settingsCard = document.createElement('div');
+  settingsCard.className = 'section-card';
 
   // Toggle 1: Hover overlay
   const hoverRow = document.createElement('div');
   hoverRow.className = 'toggle-row';
-  hoverRow.innerHTML = `<span class="toggle-label">Show hover save button on images</span>`;
-  const hoverSwitch = createSwitch(state.hoverOverlayEnabled, (val) => {
+  hoverRow.innerHTML = `<span class="toggle-label">Quick hover button on images</span>`;
+
+  const nestedOptions = document.createElement('div');
+  nestedOptions.className = `nested-options ${state.hoverOverlayEnabled ? '' : 'hidden'}`;
+
+  const hoverSwitch = createSwitch(state.hoverOverlayEnabled, async (val) => {
     state.hoverOverlayEnabled = val;
+    await settings.hoverOverlayEnabled.setValue(val);
+    if (val) {
+      nestedOptions.classList.remove('hidden');
+    } else {
+      nestedOptions.classList.add('hidden');
+    }
+    triggerSavedFeedback();
   });
   hoverRow.appendChild(hoverSwitch);
 
   // Trigger Modifier Key select row
   const modifierRow = document.createElement('div');
   modifierRow.className = 'select-row';
-  modifierRow.innerHTML = `<span class="toggle-label" style="font-size: 12px; color: #64748b;">Hover button trigger</span>`;
+  modifierRow.innerHTML = `<span class="select-label">Trigger with</span>`;
   const modifierSelect = document.createElement('select');
   modifierSelect.className = 'select-input';
   [
-    { label: 'Always on hover', val: 'none' },
-    { label: 'Hold Alt / Option key', val: 'alt' },
-    { label: 'Hold Ctrl key', val: 'ctrl' },
+    { label: 'Direct hover', val: 'none' },
+    { label: 'Hold Alt / Option', val: 'alt' },
+    { label: 'Hold Ctrl', val: 'ctrl' },
   ].forEach((opt) => {
     const el = document.createElement('option');
     el.value = opt.val;
@@ -414,15 +438,17 @@ async function mountPopup(container: HTMLElement) {
     if (opt.val === state.hoverKeyModifier) el.selected = true;
     modifierSelect.appendChild(el);
   });
-  modifierSelect.addEventListener('change', () => {
+  modifierSelect.addEventListener('change', async () => {
     state.hoverKeyModifier = modifierSelect.value as HoverKeyModifier;
+    await settings.hoverKeyModifier.setValue(state.hoverKeyModifier);
+    triggerSavedFeedback();
   });
   modifierRow.appendChild(modifierSelect);
 
   // Min size select row
   const minSizeRow = document.createElement('div');
   minSizeRow.className = 'select-row';
-  minSizeRow.innerHTML = `<span class="toggle-label" style="font-size: 12px; color: #64748b;">Min hover image size</span>`;
+  minSizeRow.innerHTML = `<span class="select-label">Min image size</span>`;
   const minSizeSelect = document.createElement('select');
   minSizeSelect.className = 'select-input';
   [
@@ -437,96 +463,119 @@ async function mountPopup(container: HTMLElement) {
     if (opt.val === state.minHoverSize) el.selected = true;
     minSizeSelect.appendChild(el);
   });
-  minSizeSelect.addEventListener('change', () => {
+  minSizeSelect.addEventListener('change', async () => {
     state.minHoverSize = Number(minSizeSelect.value) || 150;
+    await settings.minHoverSize.setValue(state.minHoverSize);
+    triggerSavedFeedback();
   });
   minSizeRow.appendChild(minSizeSelect);
+
+  nestedOptions.append(modifierRow, minSizeRow);
 
   // Toggle 2: Batch subfolder
   const subfolderRow = document.createElement('div');
   subfolderRow.className = 'toggle-row';
-  subfolderRow.innerHTML = `<span class="toggle-label">Save batch images into subfolder</span>`;
-  const subfolderSwitch = createSwitch(state.batchSubfolder, (val) => {
+  subfolderRow.innerHTML = `<span class="toggle-label">Save downloads into subfolder</span>`;
+  const subfolderSwitch = createSwitch(state.batchSubfolder, async (val) => {
     state.batchSubfolder = val;
+    await settings.batchSubfolder.setValue(val);
+    triggerSavedFeedback();
   });
   subfolderRow.appendChild(subfolderSwitch);
 
-  togglesWrap.append(hoverRow, modifierRow, minSizeRow, subfolderRow);
+  settingsCard.append(hoverRow, nestedOptions, subfolderRow);
 
-  // Actions Wrap
-  const actionsWrap = document.createElement('div');
-  actionsWrap.className = 'actions-wrap';
+  // Filename Template Section Card
+  const templateCard = document.createElement('div');
+  templateCard.className = 'section-card';
 
-  const batchBtn = document.createElement('button');
-  batchBtn.className = 'btn btn-primary';
-  batchBtn.innerHTML = `
-    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
-      <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
-    </svg>
-    <span>Open Batch Downloader</span>
+  const templateLabel = document.createElement('div');
+  templateLabel.className = 'card-title';
+  templateLabel.textContent = 'Filename Template';
+
+  const templateInputWrap = document.createElement('div');
+  templateInputWrap.className = 'template-input-wrap';
+
+  const templateInput = document.createElement('input');
+  templateInput.type = 'text';
+  templateInput.className = 'text-input';
+  templateInput.value = state.filenameTemplate;
+
+  const tokensBar = document.createElement('div');
+  tokensBar.className = 'tokens-bar';
+
+  const availableTokens = [
+    '${domain}',
+    '${timestamp}',
+    '${original_name}',
+    '${index}',
+    '${ext}',
+    '${page_title}',
+  ];
+
+  availableTokens.forEach((token) => {
+    const chip = document.createElement('span');
+    chip.className = 'token-chip';
+    chip.textContent = token;
+    chip.title = `Insert ${token}`;
+    chip.addEventListener('click', async () => {
+      const start = templateInput.selectionStart || templateInput.value.length;
+      const end = templateInput.selectionEnd || templateInput.value.length;
+      const current = templateInput.value;
+      templateInput.value = current.slice(0, start) + token + current.slice(end);
+      templateInput.focus();
+      templateInput.setSelectionRange(start + token.length, start + token.length);
+      state.filenameTemplate = templateInput.value;
+      updatePreview();
+      await settings.filenameTemplate.setValue(state.filenameTemplate);
+      triggerSavedFeedback();
+    });
+    tokensBar.appendChild(chip);
+  });
+
+  const previewLine = document.createElement('div');
+  previewLine.className = 'preview-line';
+  previewLine.innerHTML = `
+    <span class="preview-tag">Preview</span>
+    <span class="preview-val" id="ig-preview-val"></span>
   `;
+  const previewVal = previewLine.querySelector('#ig-preview-val') as HTMLElement;
 
-  const saveBtn = document.createElement('button');
-  saveBtn.className = 'btn btn-secondary';
-  saveBtn.innerHTML = `
-    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
-      <path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/>
-    </svg>
-    <span>Save Settings</span>
-  `;
-
-  const statusMsg = document.createElement('p');
-  statusMsg.className = 'status-msg';
-
-  batchBtn.addEventListener('click', async () => {
-    statusMsg.textContent = '';
-    const [tab] = await browser.tabs.query({ active: true, currentWindow: true });
-    if (!tab?.id) {
-      statusMsg.textContent = 'No active webpage tab found.';
-      return;
-    }
+  const updatePreview = () => {
+    const sampleOptions = {
+      originalName: 'photo-sunset',
+      ext: 'jpg',
+      domain: 'unsplash.com',
+      timestamp: getTimestamp(),
+      index: 1,
+      pageTitle: 'Nature Wallpapers',
+      width: 1920,
+      height: 1080,
+    };
     try {
-      const res = await browser.runtime.sendMessage({ type: 'open-batch-modal', tabId: tab.id });
-      if (res?.ok === false) {
-        statusMsg.textContent = 'Batch downloader is unavailable on this page.';
-        return;
-      }
-      window.close();
+      previewVal.textContent = formatFilename(state.filenameTemplate || '${domain}_${timestamp}_${index}.${ext}', sampleOptions);
     } catch {
-      statusMsg.textContent = 'Cannot inject into this page (e.g. system or store page).';
+      previewVal.textContent = 'Invalid template format';
     }
+  };
+
+  let debounceTimer: any = null;
+  templateInput.addEventListener('input', () => {
+    state.filenameTemplate = templateInput.value;
+    updatePreview();
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(async () => {
+      await settings.filenameTemplate.setValue(state.filenameTemplate);
+      triggerSavedFeedback();
+    }, 400);
   });
 
-  saveBtn.addEventListener('click', async () => {
-    await settings.filenameTemplate.setValue(state.filenameTemplate);
-    await settings.hoverOverlayEnabled.setValue(state.hoverOverlayEnabled);
-    await settings.batchSubfolder.setValue(state.batchSubfolder);
-    await settings.minHoverSize.setValue(state.minHoverSize);
-    await settings.batchDownloadMode.setValue(state.batchDownloadMode);
-    await settings.hoverKeyModifier.setValue(state.hoverKeyModifier);
+  updatePreview();
 
-    saveBtn.classList.add('btn-success');
-    saveBtn.innerHTML = `
-      <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
-        <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
-      </svg>
-      <span>Settings Saved!</span>
-    `;
+  templateInputWrap.append(templateInput, tokensBar, previewLine);
+  templateCard.append(templateLabel, templateInputWrap);
 
-    setTimeout(() => {
-      saveBtn.classList.remove('btn-success');
-      saveBtn.innerHTML = `
-        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
-          <path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/>
-        </svg>
-        <span>Save Settings</span>
-      `;
-    }, 1800);
-  });
-
-  actionsWrap.append(batchBtn, saveBtn, statusMsg);
-
-  app.append(header, shortcutTip, templateSection, togglesWrap, actionsWrap);
+  app.append(header, heroBtn, statusError, settingsCard, templateCard);
   container.appendChild(app);
 }
 
@@ -553,3 +602,4 @@ function createSwitch(initial: boolean, onChange: (value: boolean) => void): HTM
 
   return btn;
 }
+
