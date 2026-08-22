@@ -21,6 +21,21 @@ export default defineConfig({
         description: 'Open ImageGrab Batch Downloader',
       },
     },
+    action: {
+      default_title: 'ImageGrab',
+      default_icon: {
+        16: 'icon-16.png',
+        32: 'icon-32.png',
+        48: 'icon-48.png',
+        128: 'icon-128.png',
+      },
+    },
+    icons: {
+      16: 'icon-16.png',
+      32: 'icon-32.png',
+      48: 'icon-48.png',
+      128: 'icon-128.png',
+    },
     browser_specific_settings: {
       gecko: {
         id: '{30f41d2a-7d16-40be-8400-1329a834e65a}',
@@ -28,11 +43,6 @@ export default defineConfig({
           required: ['none'],
         },
       } as any,
-    },
-    icons: {
-      48: 'icon.svg',
-      96: 'icon.svg',
-      128: 'icon.svg',
     },
   },
 });

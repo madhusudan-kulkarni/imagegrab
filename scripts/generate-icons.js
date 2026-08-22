@@ -1,4 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+import sharp from 'sharp';
+import fs from 'fs';
+import path from 'path';
+
+const svgContent = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
   <defs>
     <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#3b82f6" />
@@ -31,4 +35,28 @@
   
   <!-- Download Arrow Glyph -->
   <path d="M64 83 V101 M56 94 L64 102 L72 94" fill="none" stroke="#ffffff" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" />
-</svg>
+</svg>`;
+
+const outputDir = path.resolve('src/public');
+if (!fs.existsSync(outputDir)) {
+  fs.mkdirSync(outputDir, { recursive: true });
+}
+
+// Write the SVG
+fs.writeFileSync(path.join(outputDir, 'icon.svg'), svgContent);
+
+const sizes = [16, 32, 48, 128];
+
+async function generatePngs() {
+  const svgBuffer = Buffer.from(svgContent);
+  for (const size of sizes) {
+    const outPath = path.join(outputDir, `icon-${size}.png`);
+    await sharp(svgBuffer)
+      .resize(size, size)
+      .png()
+      .toFile(outPath);
+    console.log(`Generated ${outPath} (${size}x${size})`);
+  }
+}
+
+generatePngs().catch(console.error);
